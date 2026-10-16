@@ -1,6 +1,8 @@
 # PS-Agents: Self-Driving Trailer Agent Design
+## Group photo
 
-Group members: _(Alicia Maryanne, Charlotte Mujuri, Lyon Agina)_
+![Group photo: Alicia Maryanne, Charlotte Mujuri and Lyon Agina](groupphoto.jpeg)
+
 
 ## 1. Agent design using PEAS
 
@@ -23,7 +25,7 @@ Group members: _(Alicia Maryanne, Charlotte Mujuri, Lyon Agina)_
 | Episodic vs sequential | **Sequential** | Each decision (route choice, overtaking, braking) affects later states and the rest of the trip. |
 | Static vs dynamic | **Dynamic** | The environment keeps changing while the agent decides (moving traffic, weather, road closures). |
 
-Further properties: the environment is **continuous** for driving control (speed, steering angle) but **discrete** for route planning (a finite set of towns and roads), and it is **known** in terms of the road map and rules of the road, even though conditions on it are not.
+
 
 ## 2. Directed graph and search tree
 
@@ -36,7 +38,7 @@ Further properties: the environment is **continuous** for driving control (speed
 - **Transition model:** driving from town A to B along road A–B puts the trailer in B.
 - **Path cost:** road distance in kilometres (sum of the edge distances).
 
-Only roads that lie on a route from Nairobi to Kisumu are kept. Towns that lead nowhere towards Kisumu (for example Embu and Nanyuki) are left out. Arrows point in the direction of travel from Nairobi towards Kisumu.
+
 
 ### 2.2 Abstraction
 
@@ -150,7 +152,7 @@ graph TD
 
 | No. | Route | Distance (km) |
 |---|---|---|
-| 1 | Nairobi → Limuru → Naivasha → Gilgil → Nakuru → Londiani → Kericho → Kisumu | **355** |
+| 1 | Nairobi → Limuru → Naivasha → Gilgil → Nakuru → Londiani → Kericho → Kisumu | 355 |
 | 2 | Nairobi → Narok → Bomet → Kericho → Kisumu | 375 |
 | 3 | Nairobi → Limuru → Naivasha → Gilgil → Nakuru → Londiani → Eldoret → Kakamega → Kisumu | 460 |
 | 4 | Nairobi → Limuru → Naivasha → Gilgil → Nakuru → Londiani → Eldoret → Kisumu | 465 |
@@ -177,11 +179,17 @@ The node with the lowest g(n) is expanded first.
 | 11 | Londiani | 230 | Kericho 265, Eldoret 315 |
 | 12 | Bomet | 235 | Kericho 285 (worse than 265, ignored) |
 | 13 | Kericho | 265 | Kisumu 355 |
-| 14 | Kisumu | **355** | goal reached |
+| 14 | Kisumu | 355 | goal reached |
 
 **Optimal path:** Nairobi → Limuru → Naivasha → Gilgil → Nakuru → Londiani → Kericho → Kisumu
 
 **Total cost:** 30 + 60 + 30 + 35 + 75 + 35 + 90 = **355 km**
 
 Uniform-cost search is optimal here because all step costs are positive, so the first time Kisumu is selected for expansion its cost is the lowest possible.
+
+
+
+
+
+
 
