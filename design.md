@@ -4,22 +4,22 @@ Group members: _(Alicia Maryanne, Charlotte Mujuri, Lyon Agina)_
 
 ## 1. Agent design using PEAS
 
-The agent is a self-driving trailer that hauls cargo between Kenyan towns along the national highway network.
+
 
 | PEAS element | Description |
 |---|---|
-| **Performance measure** | Safe arrival with no accidents or cargo damage; shortest total distance and travel time; low fuel use; on-time delivery; obeying traffic laws and axle-load limits; minimal tolls and detours. |
-| **Environment** | Kenyan highways and town roads (Nairobi, Central Highlands, Rift Valley, Lake Victoria Basin); other vehicles, matatus, motorbikes, pedestrians and livestock; weather (rain, fog on Mau Summit and Limuru); road works, traffic jams, police checks, road signs and signals; steep escarpments and sharp bends. |
-| **Actuators** | Steering, accelerator, brakes, gear selection, indicators, headlights, horn, wipers, trailer hitch and brake control, route display and alerts to the dispatcher. |
-| **Sensors** | GPS, camera, LiDAR, radar, ultrasonic sensors, speedometer, odometer, fuel gauge, tyre-pressure and load sensors, gyroscope/accelerometer, rain sensor, internet link for map and live traffic data. |
+| **Performance measure** | Safe arrival with no accidents or cargo damage, shortest total distance and travel time, low fuel use, on-time delivery, obeying traffic laws and axle-load limits, minimal tolls and detours. |
+| **Environment** | Kenyan highways and town roads other vehicles, matatus, motorbikes, pedestrians and livestock, weather road works, traffic jams, police checks, road signs and signals, steep escarpments and sharp bends. |
+| **Actuators** | Steering, accelerator, brakes, gear selection, indicators, headlights, horn, wipers, route display and alerts to the dispatcher. |
+| **Sensors** | GPS, camera, speedometer, odometer, fuel gauge, tyre-pressure and load sensors. |
 
 ### Environment properties
 
 | Property | Classification | Reason |
 |---|---|---|
-| Observability | **Partially observable** | Sensors have limited range and cannot see round bends, behind trucks or the intentions of other drivers; road conditions ahead are not fully known. |
-| Number of agents | **Multi-agent** (competitive and cooperative) | Other drivers, pedestrians and trucks act independently; drivers cooperate by following traffic rules and compete for road space. |
-| Determinism | **Stochastic** | The result of an action is uncertain: traffic, weather, breakdowns and other drivers' behaviour change the outcome. |
+| Observability | **Partially observable** | Sensors have limited range and cannot see round bends, behind trucks or the intentions of other drivers, road conditions ahead are not fully known. |
+| Number of agents | **Multi-agent**  | Other drivers, pedestrians and trucks act independently, drivers cooperate by following traffic rules and compete for road space. |
+| Determinism | **Stochastic** | The result of an action is uncertain, traffic, weather, breakdowns and other drivers' behaviour change the outcome. |
 | Episodic vs sequential | **Sequential** | Each decision (route choice, overtaking, braking) affects later states and the rest of the trip. |
 | Static vs dynamic | **Dynamic** | The environment keeps changing while the agent decides (moving traffic, weather, road closures). |
 
@@ -40,27 +40,21 @@ Only roads that lie on a route from Nairobi to Kisumu are kept. Towns that lead 
 
 ### 2.2 Abstraction
 
-Following the concept of abstraction from class, the map is represented at two levels.
+
 
 **Level 1: regions (abstract graph).** Details such as individual towns and roads are removed so the agent can first decide which regions to pass through.
 
 ```mermaid
-graph LR
-    NR["Nairobi Region<br/>Nairobi, Limuru, Thika"]
-    CH["Central Highlands<br/>Murang'a, Nyeri, Nyahururu"]
-    RV["Rift Valley<br/>Naivasha, Gilgil, Nakuru, Londiani, Kericho, Eldoret, Narok, Bomet"]
-    LV["Lake Victoria Basin<br/>Kisumu, Kakamega"]
-    NR --> CH
-    NR --> RV
-    CH --> RV
-    RV --> LV
-```
-
-Abstract plan: Nairobi Region → Rift Valley → Lake Victoria Basin. The Central Highlands route is a longer alternative. The agent then refines this plan into towns at Level 2.
-
-**Level 2: towns (detailed directed graph).** Numbers are road distances in km.
-
-```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": { "fontSize": "24px" },
+  "flowchart": {
+    "nodeSpacing": 70,
+    "rankSpacing": 100,
+    "padding": 24,
+    "useMaxWidth": false
+  }
+}}%%
 graph LR
     subgraph NR["Nairobi Region"]
         Nairobi
@@ -105,9 +99,11 @@ graph LR
     Eldoret -->|95| Kakamega
     Kakamega -->|50| Kisumu
     Eldoret -->|150| Kisumu
+
+
 ```
 
-Within Level 2, the chain Limuru → Naivasha → Gilgil → Nakuru is a single highway corridor (A104), so the agent treats it as one macro-action "Nairobi to Nakuru, 155 km" when planning at the abstract level and only expands it into towns when driving it. In the same way, "Nakuru to Kisumu" is one abstract action with three possible refinements (see the tree below).
+Within Level 2, the chain Limuru → Naivasha → Gilgil → Nakuru is a single highway corridor (A104), so the agent treats it as one action Nairobi to Nakuru, 155 km" when planning at the abstract level and only expands it into towns when driving it. In the same way, "Nakuru to Kisumu" is one abstract action with three possible refinements (see the tree below).
 
 ### 2.3 Search tree
 
@@ -181,7 +177,7 @@ The node with the lowest g(n) is expanded first.
 | 11 | Londiani | 230 | Kericho 265, Eldoret 315 |
 | 12 | Bomet | 235 | Kericho 285 (worse than 265, ignored) |
 | 13 | Kericho | 265 | Kisumu 355 |
-| 14 | **Kisumu** | **355** | goal reached |
+| 14 | Kisumu | **355** | goal reached |
 
 **Optimal path:** Nairobi → Limuru → Naivasha → Gilgil → Nakuru → Londiani → Kericho → Kisumu
 
@@ -189,4 +185,3 @@ The node with the lowest g(n) is expanded first.
 
 Uniform-cost search is optimal here because all step costs are positive, so the first time Kisumu is selected for expansion its cost is the lowest possible.
 
-> **Note on distances:** the edge distances above are approximate road distances. Before submitting, check each one with Google Maps (Directions between the two towns) and update the numbers in the graph, tree and tables. If any value changes, redo the tables in section 3; the method stays the same.
